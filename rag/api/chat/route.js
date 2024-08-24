@@ -32,6 +32,11 @@ Begin each interaction by waiting for the user's query about finding a professor
 
 `
 
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+})
+
+
 export async function POST(req){
     const data = await req.json()
     const pc = new Pinecone({
@@ -39,10 +44,10 @@ export async function POST(req){
     })
 
     const index = pc.index("rag").namespace("ns1")
-    const openai = new OpenAI()
+    
 
     const text = data[data.length - 1].content
-    const embedding = await OpenAI.Embeddings.create({
+    const embedding = await openai.embeddings.create({
         model: "text-embedding-3-small",
         input: text,
         encoding_format: "float"
@@ -79,7 +84,7 @@ export async function POST(req){
         stream: true
     })
 
-    const stream = ReadableStream({
+    const stream =  new ReadableStream({
         async start(controller){
             const encoder = new TextEncoder()
             try {
